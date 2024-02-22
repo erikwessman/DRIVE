@@ -1,9 +1,65 @@
 # UPDATE - Running with Docker
 
-...
+## Prerequisites
 
+Ensure that:
 
---- 
+1. You have a [CUDA compatible GPU](https://developer.nvidia.com/cuda-gpus)
+1. [Docker Engine](https://docs.docker.com/engine/install/) is installed
+1. [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) is installed
+1. You have [DADA2KS](https://drive.google.com/file/d/1o0TBvwp2UPBmhOsvsXRL1uJoCR4NK15X/view?usp=sharing) unzipped somewhere on your machine
+1. Also pre-trained saliency and DRIVE models installed
+
+Verify the NVIDIA Container Toolkit installation:
+
+```bash
+sudo docker run --rm --gpus all ubuntu nvidia-smi
+```
+
+## Using pre-built Docker image from GitHub Container Registry
+
+Log in to GCR via Docker:
+
+```bash
+docker login ghcr.io -u GITHUB_USERNAME -p GITHUB_ACCESS_TOKEN
+```
+
+Pull the image:
+
+```bash
+docker pull ghcr.io/OWNER/IMAGE_NAME:TAG
+```
+
+## Or, build the image yourself
+
+```bash
+docker build -t image-name:tag .
+```
+
+## Running
+
+Run the image:
+
+```bash
+docker run --rm -it --gpus all image-name bash
+```
+
+This will open a bash shell inside the container.
+
+(Also somewhere in this command we mount the dataset to the container)
+
+Once inside the container, test the model:
+
+```bash
+bash script_RL.sh test 0 4 DADA2KS_Full_SACAE_Final
+```
+
+Run the benchmark:
+
+```bash
+python benchmark/benchmark.py
+```
+
 # DRIVE (**D**eep **R**e**I**nforced Accident Anticipation with **V**isual **E**xplanation)
 [Project](https://www.rit.edu/actionlab/drive) **|** [Paper & Supp](https://arxiv.org/abs/2107.10189) **|** [Demo](https://www.youtube.com/watch?v=A3bTWejzUwM)
 
