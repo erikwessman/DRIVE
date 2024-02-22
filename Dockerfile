@@ -1,11 +1,23 @@
 FROM nvidia/cuda:11.0.3-cudnn8-runtime-ubuntu20.04
-RUN apt update
-RUN apt-get install -y python3 python3-pip
-
-RUN pip install torch==1.4.0 torchvision==0.5.0
 
 WORKDIR /DRIVE
 
 COPY . /DRIVE
 
-RUN pip install -r requirements.txt
+ENV PATH="/root/miniconda3/bin:${PATH}"
+ARG PATH="/root/miniconda3/bin:${PATH}"
+
+RUN apt-get update
+RUN apt-get install -y wget && rm -rf /var/lib/apt/lists/*
+
+RUN wget \
+    https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
+    && mkdir /root/.conda \
+    && bash Miniconda3-latest-Linux-x86_64.sh -b \
+    && rm -f Miniconda3-latest-Linux-x86_64.sh 
+
+RUN conda create -n pyRL python=3.7 -y && \
+    echo "source activate pyRL" > ~/.bashrc
+ENV PATH /opt/conda/envs/pyRL/bin:$PATH
+
+RUN conda run -n pyRL pip install -r requirements.txt
