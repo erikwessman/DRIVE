@@ -1,3 +1,9 @@
+# UPDATE - Running with Docker
+
+...
+
+
+--- 
 # DRIVE (**D**eep **R**e**I**nforced Accident Anticipation with **V**isual **E**xplanation)
 [Project](https://www.rit.edu/actionlab/drive) **|** [Paper & Supp](https://arxiv.org/abs/2107.10189) **|** [Demo](https://www.youtube.com/watch?v=A3bTWejzUwM)
 
