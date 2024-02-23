@@ -2,13 +2,10 @@
 
 ## Prerequisites
 
-Ensure that:
-
-1. You have a [CUDA compatible GPU](https://developer.nvidia.com/cuda-gpus)
-1. [Docker Engine](https://docs.docker.com/engine/install/) is installed
-1. [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) is installed
-1. You have [DADA2KS](https://drive.google.com/file/d/1o0TBvwp2UPBmhOsvsXRL1uJoCR4NK15X/view?usp=sharing) unzipped somewhere on your machine
-1. Also pre-trained saliency and DRIVE models installed
+- A [CUDA compatible GPU](https://developer.nvidia.com/cuda-gpus) with Nvidia drivers installed
+- [Docker Engine](https://docs.docker.com/engine/install/) installed
+- [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) installed
+- [DADA2KS](https://drive.google.com/file/d/1o0TBvwp2UPBmhOsvsXRL1uJoCR4NK15X/view?usp=sharing) unzipped somewhere on your machine
 
 Verify the NVIDIA Container Toolkit installation:
 
@@ -18,22 +15,29 @@ sudo docker run --rm --gpus all ubuntu nvidia-smi
 
 ## Using pre-built Docker image from GitHub Container Registry
 
-Log in to GCR via Docker:
+1. Generate a personal access token with `write:packages` and `delete:packages` rights at https://github.com/settings/tokens.
+
+2. Log in to GHCR via Docker:
 
 ```bash
-docker login ghcr.io -u GITHUB_USERNAME -p GITHUB_ACCESS_TOKEN
+docker login ghcr.io -u [GITHUB_USERNAME] -p [GITHUB_ACCESS_TOKEN]
 ```
 
-Pull the image:
+3. Pull the image:
 
 ```bash
-docker pull ghcr.io/OWNER/IMAGE_NAME:TAG
+docker pull ghcr.io/erikwessman/drive
 ```
 
 ## Or, build the image yourself
 
+Follow the steps for downloading and placing  `models/saliency/mlnet_25.pth` and `output/DADA2KS_Full_SACAE_Final/checkpoints/sac_epoch_50.pt` in [Testing](#testing). 
+
+Then, run the following command in your DRIVE directory.
+
 ```bash
-docker build -t image-name:tag .
+# in your DRIVE directory
+docker build -t drive:[tag] .
 ```
 
 ## Running
@@ -41,23 +45,15 @@ docker build -t image-name:tag .
 Run the image:
 
 ```bash
-docker run --rm -it --gpus all image-name bash
+docker run --rm -it -v /path/to/host/dataset/directory:/DRIVE/data --gpus all drive bash
 ```
 
 This will open a bash shell inside the container.
-
-(Also somewhere in this command we mount the dataset to the container)
 
 Once inside the container, test the model:
 
 ```bash
 bash script_RL.sh test 0 4 DADA2KS_Full_SACAE_Final
-```
-
-Run the benchmark:
-
-```bash
-python benchmark/benchmark.py
 ```
 
 # DRIVE (**D**eep **R**e**I**nforced Accident Anticipation with **V**isual **E**xplanation)
