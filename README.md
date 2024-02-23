@@ -46,8 +46,10 @@ Run the image:
 
 ```bash
 # For example:
-# docker run --rm -it -v /home/erik/devel/ted-sfc/DRIVE/data:/DRIVE/data --gpus all drive bash
-docker run --rm -it -v /path/to/host/data/directory:/DRIVE/data --gpus all drive bash
+# docker run --rm -it -v /home/erik/devel/ted-sfc/DRIVE/data:/DRIVE/data --gpus all ghcr.io/erikwessman/drive bash
+docker run --rm -it -v /path/to/host/data/directory:/DRIVE/data --gpus all ghcr.io/erikwessman/drive bash
+# OR if you built the image yourself
+docker run --rm -it -v /path/to/host/data/directory:/DRIVE/data --gpus all drive:[tag] bash
 ```
 
 This will open a bash shell inside the container.
