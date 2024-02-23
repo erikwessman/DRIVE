@@ -45,7 +45,9 @@ docker build -t drive:[tag] .
 Run the image:
 
 ```bash
-docker run --rm -it -v /path/to/host/dataset/directory:/DRIVE/data --gpus all drive bash
+# For example:
+# docker run --rm -it -v /home/erik/devel/ted-sfc/DRIVE/data:/DRIVE/data --gpus all drive bash
+docker run --rm -it -v /path/to/host/data/directory:/DRIVE/data --gpus all drive bash
 ```
 
 This will open a bash shell inside the container.
