@@ -1,3 +1,65 @@
+# UPDATE - Running with Docker
+
+## Prerequisites
+
+- A [CUDA compatible GPU](https://developer.nvidia.com/cuda-gpus) with Nvidia drivers installed
+- [Docker Engine](https://docs.docker.com/engine/install/) installed
+- [NVIDIA Container Toolkit](https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html) installed
+- [DADA2KS](https://drive.google.com/file/d/1o0TBvwp2UPBmhOsvsXRL1uJoCR4NK15X/view?usp=sharing) unzipped somewhere on your machine
+
+Verify the NVIDIA Container Toolkit installation:
+
+```bash
+sudo docker run --rm --gpus all ubuntu nvidia-smi
+```
+
+## Using pre-built Docker image from GitHub Container Registry
+
+1. Generate a personal access token with `write:packages` and `delete:packages` rights at https://github.com/settings/tokens.
+
+2. Log in to GHCR via Docker:
+
+```bash
+docker login ghcr.io -u [GITHUB_USERNAME] -p [GITHUB_ACCESS_TOKEN]
+```
+
+3. Pull the image:
+
+```bash
+docker pull ghcr.io/erikwessman/drive
+```
+
+## Or, build the image yourself
+
+Follow the steps for downloading and placing  `models/saliency/mlnet_25.pth` and `output/DADA2KS_Full_SACAE_Final/checkpoints/sac_epoch_50.pt` in [Testing](#testing). 
+
+Then, run the following command in your DRIVE directory.
+
+```bash
+# in your DRIVE directory
+docker build -t drive:[tag] .
+```
+
+## Running
+
+Run the image:
+
+```bash
+# For example:
+# docker run --rm -it -v /home/erik/devel/ted-sfc/DRIVE/data:/DRIVE/data --gpus all ghcr.io/erikwessman/drive bash
+docker run --rm -it -v /path/to/host/data/directory:/DRIVE/data --gpus all ghcr.io/erikwessman/drive bash
+# OR if you built the image yourself
+docker run --rm -it -v /path/to/host/data/directory:/DRIVE/data --gpus all drive:[tag] bash
+```
+
+This will open a bash shell inside the container.
+
+Once inside the container, test the model:
+
+```bash
+bash script_RL.sh test 0 4 DADA2KS_Full_SACAE_Final
+```
+
 # DRIVE (**D**eep **R**e**I**nforced Accident Anticipation with **V**isual **E**xplanation)
 [Project](https://www.rit.edu/actionlab/drive) **|** [Paper & Supp](https://arxiv.org/abs/2107.10189) **|** [Demo](https://www.youtube.com/watch?v=A3bTWejzUwM)
 
