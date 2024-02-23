@@ -224,7 +224,10 @@ def train():
 
 def test_all(testdata_loader, env, agent):
     all_pred_scores, all_gt_labels, all_pred_fixations, all_gt_fixations, all_toas, all_vids = [], [], [], [], [], []
+    total_video_test_time = []
+    total_frame_test_times = []
     for i, (video_data, _, coord_data, data_info) in enumerate(testdata_loader):  # (B, T, H, W, C)
+        start = time.time()
         print("Testing video %d/%d, file: %d/%d.avi, frame #: %d (fps=%.2f)."
             %(i+1, len(testdata_loader), data_info[0, 0], data_info[0, 1], video_data.size(1), 30/cfg.ENV.frame_interval))
         # set environment data
@@ -249,6 +252,14 @@ def test_all(testdata_loader, env, agent):
             fixation_gt[:, i_steps] = env.coord_data[:, next_step*env.step_size, :].cpu().numpy()
             # next step
             i_steps += 1
+        
+        # calculate and log the time per video and frame
+        end = time.time()
+        video_test_time = end - start
+        frame_test_time = video_test_time / video_data.size(1)
+        total_video_test_times.append(video_test_time)
+        total_frame_test_times.append(frame_test_time)
+        print(f"Testing of video {i+1}/{len(testdata_loader)} took {round(video_test_time, 3)}s with {round(frame_test_time, 3)}s per frame")
 
         # save results
         all_pred_scores.append(score_pred)  # (B, T)
@@ -257,6 +268,12 @@ def test_all(testdata_loader, env, agent):
         all_gt_fixations.append(fixation_gt)      # (B, T, 2)
         all_toas.append(env.begin_accident.cpu().numpy())  # (B,)
         all_vids.append(data_info[:,:4].numpy())
+
+    # calculate and log average test benchmarks
+    total_test_time = sum(total_video_test_times)
+    average_per_video = sum(total_video_test_times) / len(total_video_test_times)
+    average_per_frame = sum(total_frame_test_times) / len(total_frame_test_times)
+    print(f"Summary \n Total test time: {total_test_time}s \n Average per video: {average_per_video}s \n Average per frame: {average_per_frame}s")
     
     all_pred_scores = np.concatenate(all_pred_scores)
     all_gt_labels = np.concatenate(all_gt_labels)
@@ -332,6 +349,7 @@ def test():
 
 
 if __name__ == "__main__":
+    start = time.time()
     
     # parse input arguments
     cfg = parse_configs()
@@ -343,5 +361,10 @@ if __name__ == "__main__":
         train()
     elif cfg.phase == 'test':
         test()
+        end = time.time()
+        test_time = end - start
+        minutes = int(test_time // 60)
+        seconds = int(test_time % 60)
+        print(f"Testing was completed in {minutes}m{seconds}s")
     else:
         raise NotImplementedError
