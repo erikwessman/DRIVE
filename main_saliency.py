@@ -19,33 +19,20 @@ def parse_configs():
     parser = argparse.ArgumentParser(
         description='PyTorch saliency implementation')
     # For training and testing
-    parser.add_argument('--config', default="cfgs/sac_revere.yml",
-                        help='Configuration file for SAC algorithm.')
     parser.add_argument('--phase', default='train', choices=['train', 'test'],
                         help='Training or testing phase.')
     parser.add_argument('--gpu_id', type=int, default=0, metavar='N',
                         help='The ID number of GPU. Default: 0')
-    parser.add_argument('--num_workers', type=int, default=4, metavar='N',
-                        help='The number of workers to load dataset. Default: 4')
-    parser.add_argument('--baseline', default='none', choices=['random', 'all_pos', 'all_neg', 'none'],
-                        help='setup baseline results for testing comparison')
+    parser.add_argument('--config', default="cfgs/sac_revere.yml",
+                        help='Configuration file for saliceny algorithm.')
     parser.add_argument('--seed', type=int, default=123, metavar='N',
                         help='random seed (default: 123)')
-    parser.add_argument('--num_epoch', type=int, default=50, metavar='N',
-                        help='number of epoches (default: 50)')
-    parser.add_argument('--snapshot_interval', type=int, default=5, metavar='N',
-                        help='The epoch interval of model snapshot (default: 5)')
-    parser.add_argument('--test_epoch', type=int, default=-1,
-                        help='The snapshot id of trained model for testing.')
-    parser.add_argument('--output', default='./output/',
-                        help='Directory of the output. ')
     args = parser.parse_args()
 
     with open(args.config, 'r') as f:
         cfg = EasyDict(yaml.safe_load(f))
     cfg.update(vars(args))
-    device = torch.device(
-        'cuda') if torch.cuda.is_available() else torch.device('cpu')
+    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
     cfg.update(device=device)
 
     return cfg
@@ -162,14 +149,7 @@ def test():
     model = MLNet(cfg.input_shape).to(device)  # ~700MiB
 
     # load model weight file
-    ckpt_dir = cfg.env_model
-    assert os.path.exists(ckpt_dir), "Checkpoint directory does not exist! %s" % (ckpt_dir)
-    if cfg.model_weights is not None:
-        model_file = os.path.join(ckpt_dir, cfg.model_weights)
-        assert os.path.exists(model_file), "Weight file does not exist! %s" % (model_file)
-    else:
-        # load from the last checkpoint
-        model_file = os.path.join(ckpt_dir, sorted(os.listdir(ckpt_dir))[-1])
+    model_file = cfg.sal_model
     ckpt = torch.load(model_file, map_location=device)
     model.load_state_dict(ckpt['model'])
     model.to(device)

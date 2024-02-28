@@ -22,6 +22,6 @@ CUDA_VISIBLE_DEVICES=$GPU_IDS
 python main_saliency.py \
     --phase $PHASE \
     --gpu_id $GPU_ID \
-    --config $CONFIG \
-    --output ./output/REVERE/saliency
+    --config $CONFIG
+
 echo "Done!"
