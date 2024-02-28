@@ -149,6 +149,10 @@ metrics/saliency/code_forMetrics
 data/DADA-2000*
 data/DAD
 data/CCD
+data/REVERE
+data/SMIRK
+data/VAS-HD
+data/ZOD
 *tmp*
 examples/
 draw_curves.py
