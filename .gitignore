@@ -150,6 +150,7 @@ data/DADA-2000*
 data/REVERE
 data/DAD
 data/CCD
+data/ZOD
 *tmp*
 examples/
 draw_curves.py
