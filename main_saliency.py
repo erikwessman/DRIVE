@@ -11,7 +11,7 @@ import numpy as np
 from tqdm import tqdm
 
 
-MODEL_PATH = "models/saliency/mlnet_25.pth"
+MODEL_PATH = "output/saliency/checkpoints/saliency_model_25.pth"
 INPUT_SHAPE = [480, 640]
 FPS = 10
 
