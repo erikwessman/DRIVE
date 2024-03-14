@@ -17,10 +17,10 @@ FPS = 10
 
 
 def parse_arguments():
-    parser = argparse.ArgumentParser(description='Saliency implementation')
-    parser.add_argument('data_path', help='')
-    parser.add_argument('output_path', help='')
-    parser.add_argument('--gpu_id', type=int, default=0, metavar='N', help='')
+    parser = argparse.ArgumentParser(description="Saliency implementation")
+    parser.add_argument("data_path", help="")
+    parser.add_argument("output_path", help="")
+    parser.add_argument("--gpu_id", type=int, default=0, metavar="N", help="")
     return parser.parse_args()
 
 
@@ -28,19 +28,27 @@ def main(data_path, output_path, device):
     os.makedirs(output_path, exist_ok=True)
 
     transform_image = transforms.Compose([ProcessImages(INPUT_SHAPE)])
-    params_norm = {'mean': [0.485, 0.456, 0.406], 'std': [0.229, 0.224, 0.225]}
-    test_data = TEDLoader(data_path, transforms=transform_image, params_norm=params_norm)
+    params_norm = {"mean": [0.485, 0.456, 0.406], "std": [0.229, 0.224, 0.225]}
+    test_data = TEDLoader(
+        data_path, transforms=transform_image, params_norm=params_norm
+    )
     testdata_loader = DataLoader(dataset=test_data, batch_size=1, shuffle=False)
 
     model = MLNet(INPUT_SHAPE).to(device)  # ~700MiB
 
     ckpt = torch.load(MODEL_PATH, map_location=device)
-    model.load_state_dict(ckpt['model'])
+    model.load_state_dict(ckpt["model"])
     model.to(device)
     model.eval()
 
     with torch.no_grad():
-        for i, (video, video_info) in enumerate(tqdm(testdata_loader, total=len(testdata_loader), desc="Creating heatmap videos")):
+        for i, (video, video_info) in enumerate(
+            tqdm(
+                testdata_loader,
+                total=len(testdata_loader),
+                desc="Creating heatmap videos",
+            )
+        ):
             video_id = str(video_info[0][0])
             num_frames, height, width = video_info[1:]
             num_frames = num_frames.item()
@@ -66,7 +74,9 @@ def main(data_path, output_path, device):
 
                 # Decode results
                 pred_saliency = padding_inv(out, height, width)
-                pred_saliency = np.tile(np.expand_dims(np.uint8(pred_saliency), axis=-1), (1, 1, 3))
+                pred_saliency = np.tile(
+                    np.expand_dims(np.uint8(pred_saliency), axis=-1), (1, 1, 3)
+                )
                 pred_video.append(pred_saliency)
 
             pred_video = np.array(pred_video, dtype=np.uint8)  # (T, H, W, C)
@@ -78,7 +88,7 @@ if __name__ == "__main__":
 
     print("Using GPU devices: ", args.gpu_id)
 
-    os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu_id)
-    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
+    os.environ["CUDA_VISIBLE_DEVICES"] = str(args.gpu_id)
+    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
     main(args.data_path, args.output_path, device)

@@ -29,8 +29,8 @@ class TEDLoader(Dataset):
 
     def get_video_data(self, index):
         video_id = self.data_list[index]
-        video_path = os.path.join(self.root_path, video_id, f'{video_id}.avi')
-        assert os.path.exists(video_path), "Path does not exist: %s"%(video_path)
+        video_path = os.path.join(self.root_path, video_id, f"{video_id}.avi")
+        assert os.path.exists(video_path), "Path does not exist: %s" % (video_path)
 
         cap = cv2.VideoCapture(video_path)
         ret, frame = cap.read()
@@ -56,6 +56,8 @@ class TEDLoader(Dataset):
             video = self.transforms(video)
             if self.params_norm is not None:
                 for i in range(video.shape[1]):
-                    video[:, i] = (video[:, i] - self.params_norm['mean'][i]) / self.params_norm['std'][i]
+                    video[:, i] = (
+                        video[:, i] - self.params_norm["mean"][i]
+                    ) / self.params_norm["std"][i]
 
         return video, video_info
