@@ -18,15 +18,15 @@ FPS = 10
 
 def parse_arguments():
     parser = argparse.ArgumentParser(description='Saliency implementation')
-    parser.add_argument('--data_path', help='')
-    parser.add_argument('--output_path', help='')
+    parser.add_argument('data_path', help='')
+    parser.add_argument('output_path', help='')
     parser.add_argument('--gpu_id', type=int, default=0, metavar='N', help='')
-    args = parser.parse_args()
-
-    return args
+    return parser.parse_args()
 
 
 def main(data_path, output_path, device):
+    os.makedirs(output_path, exist_ok=True)
+
     transform_image = transforms.Compose([ProcessImages(INPUT_SHAPE)])
     params_norm = {'mean': [0.485, 0.456, 0.406], 'std': [0.229, 0.224, 0.225]}
     test_data = TEDLoader(data_path, transforms=transform_image, params_norm=params_norm)
@@ -40,19 +40,23 @@ def main(data_path, output_path, device):
     model.eval()
 
     with torch.no_grad():
-        for i, (video, video_info) in enumerate(testdata_loader):
-            video_id, num_frames, height, width = video_info
+        for i, (video, video_info) in enumerate(tqdm(testdata_loader, total=len(testdata_loader), desc="Creating heatmap videos")):
+            video_id = str(video_info[0][0])
+            num_frames, height, width = video_info[1:]
+            num_frames = num_frames.item()
+            height = height.item()
+            width = width.item()
 
             result_dir = os.path.join(output_path, video_id)
             os.makedirs(result_dir, exist_ok=True)
 
-            result_videofile = os.path.join(result_dir, 'heatmap.avi')
+            result_videofile = os.path.join(result_dir, f"{video_id}_heatmap.avi")
 
             if os.path.exists(result_videofile):
                 continue
 
             pred_video = []
-            for fid in tqdm(range(num_frames), total=num_frames, desc=f"Testing video [{i+1} / {len(testdata_loader)}]"):
+            for fid in range(num_frames):
                 frame_data = video[:, fid].to(device, dtype=torch.float)
 
                 # Forward
@@ -73,8 +77,8 @@ if __name__ == "__main__":
     args = parse_arguments()
 
     print("Using GPU devices: ", args.gpu_id)
+
     os.environ['CUDA_VISIBLE_DEVICES'] = str(args.gpu_id)
-    device = torch.device(
-        'cuda') if torch.cuda.is_available() else torch.device('cpu')
+    device = torch.device('cuda') if torch.cuda.is_available() else torch.device('cpu')
 
     main(args.data_path, args.output_path, device)

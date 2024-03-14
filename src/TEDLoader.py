@@ -25,11 +25,11 @@ class TEDLoader(Dataset):
         nr_frames = video_data.shape[0]
         height = video_data.shape[1]
         width = video_data.shape[2]
-        data_info = np.array([video_id, nr_frames, height, width], dtype=np.int64)
-        return data_info
+        return [video_id, nr_frames, height, width]
 
     def get_video_data(self, index):
-        video_path = os.path.join(self.root_path, self.data_list[index], 'original.avi')
+        video_id = self.data_list[index]
+        video_path = os.path.join(self.root_path, video_id, f'{video_id}.avi')
         assert os.path.exists(video_path), "Path does not exist: %s"%(video_path)
 
         cap = cv2.VideoCapture(video_path)
