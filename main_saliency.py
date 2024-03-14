@@ -11,7 +11,7 @@ import numpy as np
 from tqdm import tqdm
 
 
-MODEL_PATH = "output/saliency/checkpoints/saliency_model_25.pth"
+MODEL_PATH = "models/saliency/mlnet_25.pth"
 INPUT_SHAPE = [480, 640]
 FPS = 10
 
@@ -64,9 +64,9 @@ def main(data_path, output_path, device):
                 out = out.cpu().numpy() if out.is_cuda else out.detach().numpy()
                 out = np.squeeze(out)
 
-                # Decode results and convert to RGB for visualization
+                # Decode results
                 pred_saliency = padding_inv(out, height, width)
-                pred_saliency = np.tile(np.expand_dims(np.uint8(pred_saliency * 255), axis=-1), (1, 1, 3))  # Convert to RGB
+                pred_saliency = np.tile(np.expand_dims(np.uint8(pred_saliency), axis=-1), (1, 1, 3))
                 pred_video.append(pred_saliency)
 
             pred_video = np.array(pred_video, dtype=np.uint8)  # (T, H, W, C)

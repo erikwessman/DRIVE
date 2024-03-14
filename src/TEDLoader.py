@@ -38,7 +38,7 @@ class TEDLoader(Dataset):
         video_data = []
 
         while ret:
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)  # RGB: (660, 1584, 3)
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             video_data.append(frame)
             ret, frame = cap.read()
 
