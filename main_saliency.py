@@ -1,5 +1,6 @@
 import os
 import torch
+import yaml
 from src.saliency.mlnet import MLNet
 from src.TEDLoader import TEDLoader
 import argparse
@@ -13,7 +14,11 @@ from tqdm import tqdm
 
 MODEL_PATH = "DRIVE/models/saliency/mlnet_25.pth"
 INPUT_SHAPE = [480, 640]
-FPS = 10
+
+
+def load_config(file_path) -> dict:
+    with open(file_path, "r") as f:
+        return yaml.safe_load(f)
 
 
 def parse_arguments():
@@ -25,7 +30,7 @@ def parse_arguments():
     return parser.parse_args()
 
 
-def main(data_path, output_path, device):
+def main(data_path, output_path, config, device):
     os.makedirs(output_path, exist_ok=True)
 
     transform_image = transforms.Compose([ProcessImages(INPUT_SHAPE)])
@@ -81,15 +86,16 @@ def main(data_path, output_path, device):
                 pred_video.append(pred_saliency)
 
             pred_video = np.array(pred_video, dtype=np.uint8)  # (T, H, W, C)
-            write_video(result_videofile, torch.from_numpy(pred_video), FPS)
+            write_video(result_videofile, torch.from_numpy(pred_video), config["fps"])
 
 
 if __name__ == "__main__":
     args = parse_arguments()
+    config = load_config(args.config_path)
 
     print("Using GPU devices: ", args.gpu_id)
 
     os.environ["CUDA_VISIBLE_DEVICES"] = str(args.gpu_id)
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
 
-    main(args.data_path, args.output_path, device)
+    main(args.data_path, args.output_path, config, device)
