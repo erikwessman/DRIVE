@@ -48,18 +48,15 @@ def main(data_path, output_path, config, device):
     model.eval()
 
     with torch.no_grad():
-        for i, (video, video_info) in enumerate(
-            tqdm(
-                testdata_loader,
-                total=len(testdata_loader),
-                desc="Creating heatmap videos",
-            )
-        ):
+        pbar = tqdm(testdata_loader, desc="Creating heatmap videos")
+        for video, video_info in pbar:
             video_id = str(video_info[0][0])
             num_frames, height, width = video_info[1:]
             num_frames = num_frames.item()
             height = height.item()
             width = width.item()
+
+            pbar.set_description(f"Processing folder {video_id}")
 
             result_dir = os.path.join(output_path, video_id)
             os.makedirs(result_dir, exist_ok=True)
@@ -88,12 +85,12 @@ def main(data_path, output_path, config, device):
             pred_video = np.array(pred_video, dtype=np.uint8)  # (T, H, W, C)
             write_video(result_videofile, torch.from_numpy(pred_video), config["fps"])
 
+            pbar.set_description("Processing folders")
+
 
 if __name__ == "__main__":
     args = parse_arguments()
     config = load_config(args.config_path)
-
-    print("Using GPU devices: ", args.gpu_id)
 
     os.environ["CUDA_VISIBLE_DEVICES"] = str(args.gpu_id)
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
