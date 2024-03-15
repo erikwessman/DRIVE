@@ -11,7 +11,7 @@ import numpy as np
 from tqdm import tqdm
 
 
-MODEL_PATH = "models/saliency/mlnet_25.pth"
+MODEL_PATH = "DRIVE/models/saliency/mlnet_25.pth"
 INPUT_SHAPE = [480, 640]
 FPS = 10
 
@@ -20,6 +20,7 @@ def parse_arguments():
     parser = argparse.ArgumentParser(description="Saliency implementation")
     parser.add_argument("data_path", help="")
     parser.add_argument("output_path", help="")
+    parser.add_argument("config_path", help="")
     parser.add_argument("--gpu_id", type=int, default=0, metavar="N", help="")
     return parser.parse_args()
 
