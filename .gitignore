@@ -156,3 +156,5 @@ data/ZOD
 *tmp*
 examples/
 draw_curves.py
+
+.DS_STORE
